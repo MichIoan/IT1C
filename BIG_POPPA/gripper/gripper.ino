@@ -1,24 +1,35 @@
-#include <Servo.h>
-Servo gripper;
-int openPos = 125;
-int closePos = 48;
+const int gripper=10;
+const int gripperOpenPulse=1600;
+const int gripperClosedPulse=971;
+const int servoPulseRepeat = 10; // number of pulse send to servo
 
-void setup() {
-  // Attach servo to pin 10
-  gripper.attach(10);
+void setup(){
+  
 }
 
-void loop() {
+void loop(){
   openGripper();
-  delay(1500);
+  delay(500);
   closeGripper();
-  delay(1500);
+  delay(2000);
 }
 
-void openGripper(){
-  gripper.write(openPos);
-}
 
-void closeGripper(){
-  gripper.write(closePos);
+void gripperServo(int pulse)
+{
+    for(int i = 0; i < servoPulseRepeat;i++)
+    {
+        digitalWrite(gripper,HIGH);
+        delayMicroseconds(pulse);
+        digitalWrite(gripper,LOW);
+        delay(20);
+    }
+}
+void openGripper()
+{
+    gripperServo(gripperOpenPulse);
+}
+void closeGripper()
+{
+  gripperServo(gripperClosedPulse);
 }
