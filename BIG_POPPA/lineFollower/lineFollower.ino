@@ -1,17 +1,24 @@
-const int lineSensors[] = {A0, A1, A2, A3, A4, A5, A6, A7}; //IR Sensors
 const int leftB = 9; //motor left - going backwards
 const int leftF = 5; // motor left - going forward
 const int rightB = 6; //motor right - going backwards
 const int rightF = 11; //motor right - going forward
 
+int rightSensors;
+int leftSensors;
+
+int IR1;
+int IR2;
+int IR3;
+int IR4;
+int IR5;
+int IR6;
+int IR7;
+int IR8;
+
 //defining variables for fine tuning on line following
 int leftValue = 0;
 int rightValue = 0;
 int adjustSpeed = 0;
-
-int sensorValue[8]; //for reading IR sensors values
-
-int i;
 
 //===============================
 //************SETUP**************
@@ -26,7 +33,6 @@ void setup(){
 //************LOOP***************
 //===============================
 void loop() {
-  readSensors();
   followLine();
 }
 
@@ -38,38 +44,41 @@ void goForward() {
   analogWrite(rightF, 250);
 }
 
-void followLine(){
-  if(sensorValue[2] > 600 || sensorValue[3] > 600 || sensorValue[4] > 600 || sensorValue[5] > 600 || sensorValue[6] > 600 || sensorValue[7] > 600){
-      int leftValue = (sensorValue[5] + sensorValue[6] + sensorValue[7]) / 3;
-      int rightValue = (sensorValue[2] + sensorValue[3] + sensorValue[4]) / 3;
-  
-      //if the sensor readings on the left are bigger, go slightly left - center the robot on the line
-      if(leftValue > rightValue){ //checking if robot is reading more with sensors 5 and 6
-        //if robot is more to the left, the right wheel is having more speed
-        adjustRight();
-      }else{
-        //if robot is more to the right, the left wheel will have more speed
-        adjustLeft();
-      }
-    }
-}
-
-void adjustLeft(){
-  adjustSpeed = map(rightValue, 0, 1023, 0, 255);
+void left(){
   analogWrite(leftF, 255);
-  analogWrite(rightF, adjustSpeed);
-  Serial.println(adjustSpeed);
+  analogWrite(rightF, 180);
 }
 
-void adjustRight(){
-  adjustSpeed = map(leftValue, 0, 1023, 0, 255);
-  analogWrite(leftF, adjustSpeed);
+void right(){
+  analogWrite(leftF, 180);
   analogWrite(rightF, 255);
-  Serial.println(adjustSpeed);
+}
+
+void followLine(){
+  readSensors();
+  if(IR3 > 500 && IR4 > 500){
+    analogWrite(leftF, 255);
+    analogWrite(rightF, 80);
+  }else if(IR5 > 500 && IR6 > 500){
+    analogWrite(leftF, 80);
+    analogWrite(rightF, 255);
+  }else if(IR2 > 500 && IR3 > 500){
+    analogWrite(leftF, 255);
+    analogWrite(rightF, 0);
+  }else if(IR6 > 500 && IR7 > 500){
+    analogWrite(leftF, 0);
+    analogWrite(rightF, 255);
+  }else if(IR2 > 500 && IR1 > 500){
+    analogWrite(leftF, 255);
+    analogWrite(rightF, 0);
+  }else if(IR7 > 500 && IR8 > 500){
+    analogWrite(leftF, 0);
+    analogWrite(rightF, 255);
+  }
 }
 
 bool squareDetected(){
-  if(sensorValue[1] > 800 && sensorValue[2] > 800 && sensorValue[3] > 800 &&sensorValue[4] > 800 && sensorValue[5] > 800 && sensorValue[6] > 800 &&   sensorValue[7] > 800 && sensorValue[8] > 800){
+  if(IR1 > 800 && IR2 > 800 && IR3 > 800 && IR4 > 800 && IR5 > 800 && IR6 > 800 && IR7 > 800 && IR8 > 800){
     return true;
   }
 }
@@ -83,14 +92,23 @@ void setupMotors(){
 }
 
 void setupIRSensors(){
-  //initializing IR Sensors
-  for(i=1; i<=8; i++){
-    pinMode(lineSensors[i], INPUT);
-  }
+ pinMode(A0, INPUT);
+ pinMode(A1, INPUT);
+ pinMode(A2, INPUT);
+ pinMode(A3, INPUT);
+ pinMode(A4, INPUT);
+ pinMode(A5, INPUT);
+ pinMode(A6, INPUT);
+ pinMode(A7, INPUT);
 }
 
 void readSensors(){
-  for(i=1; i<=8; i++){
-    sensorValue[i]=analogRead(lineSensors[i]);
-  }
+  IR1 = analogRead(A0);
+  IR2 = analogRead(A1);
+  IR3 = analogRead(A2);
+  IR4 = analogRead(A3);
+  IR5 = analogRead(A4);
+  IR6 = analogRead(A5);
+  IR7 = analogRead(A6);
+  IR8 = analogRead(A7);
 }
